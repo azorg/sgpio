@@ -3,10 +3,10 @@
  * File: "sgpio.c"
  */
 //----------------------------------------------------------------------------
-#include "sgpio.h"    // `sgpio_t`
-#include <errno.h>    // errno
-#include <string.h>   // strlen()
-#include <sys/poll.h> // poll()
+#include "sgpio.h"  // `sgpio_t`
+#include <errno.h>  // errno
+#include <string.h> // strlen(), memset()
+#include <poll.h>   // poll()
 //----------------------------------------------------------------------------
 // write `size` bytes to stream `fd` from `buf` at once
 int sgpio_write(int fd, const char *buf, int size)
@@ -247,21 +247,23 @@ int sgpio_set_val(sgpio_t *self, int val)
 
   if (self->fd < 0)
   {
-    SGPIO_DBG("unset mode in sgpio_set(%d)", self->num);
+    SGPIO_DBG("unset direction mode in sgpio_set_val(%d)", self->num);
     return SGPIO_ERR_UNSET_DIR;
   }
 
+#if 0
   retv = lseek(self->fd, 0, SEEK_SET);
   if (retv != 0)
   {
-    SGPIO_DBG("lseek(0) return %d in sgpio_set(%d)", retv, self->num);
+    SGPIO_DBG("lseek(0) return %d in sgpio_set_val(%d)", retv, self->num);
     return SGPIO_ERR_LSEEK;
   }
-  
+#endif
+
   retv = write(self->fd, &c, sizeof(char));
   if (retv != sizeof(char))
   {
-    SGPIO_DBG("write(%d) return %d in sgpio_set(%d)",
+    SGPIO_DBG("write(%d) return %d in sgpio_set_val(%d)",
               (int) sizeof(char), retv, self->num);
     return SGPIO_ERR_SET;
   }
@@ -279,8 +281,10 @@ int sgpio_poll_ex(const sgpio_t *self, int msec, int sigmask)
 
   while (1)
   {
+    memset((void*) fds, 0, sizeof(fds));
     fds->fd      = self->fd;
-    fds->events  = POLLIN | POLLPRI | POLLERR;
+    //fds->events  = POLLIN | POLLPRI | POLLERR;
+    fds->events  = POLLPRI;
     fds->revents = 0;
 
     retv = poll(fds, 1, msec);
@@ -308,7 +312,8 @@ int sgpio_poll_ex(const sgpio_t *self, int msec, int sigmask)
     if (fds->revents & (POLLERR | POLLNVAL))
       return SGPIO_ERR_POOL2; // error #2
 
-    if (fds->revents & (POLLIN | POLLPRI))
+    //if (fds->revents & (POLLIN | POLLPRI))
+    if (fds->revents & (POLLPRI))
       return 1; // may non block read
   }
 

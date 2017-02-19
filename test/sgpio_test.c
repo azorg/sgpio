@@ -9,6 +9,8 @@
 //---------------------------------------------------------------------------
 int main()
 {
+  int i;
+
   sgpio_t gpio;
   int retv, gpio_num = 12; // Orange Pi Zero GPIO on pin 3
 
@@ -23,41 +25,34 @@ int main()
 
   if (1)
   {
-    retv = sgpio_set_dir(&gpio, SGPIO_DIR_IN);
-    printf(">>> sgpio_set_dir(%d,%d): '%s'\n",
-           sgpio_get_num(&gpio), SGPIO_DIR_OUT, sgpio_error_str(retv));
-  }
-  
-  if (1)
-  {
-    retv = sgpio_poll(&gpio, 3000);
-    printf(">>> sgpio_poll(%i) = '%d'",
-           sgpio_get_num(&gpio), retv);
-    if (retv < 0)
-      printf(" '%s'\n", sgpio_error_str(retv));
-    else
-      printf("\n");
-  }
 
-  if (1)
-  {
+/*
+    retv = sgpio_set_edge(&gpio, SGPIO_EDGE_BOTH);
+    printf(">>> sgpio_set_edge(%d,%d): '%s'\n",
+           sgpio_get_num(&gpio), SGPIO_EDGE_BOTH, sgpio_error_str(retv));
+    
     retv = sgpio_set_edge(&gpio, SGPIO_EDGE_RISING);
     printf(">>> sgpio_set_edge(%d,%d): '%s'\n",
            sgpio_get_num(&gpio), SGPIO_EDGE_RISING, sgpio_error_str(retv));
-    
+*/  
+
     retv = sgpio_set_edge(&gpio, SGPIO_EDGE_FALLING);
     printf(">>> sgpio_set_edge(%d,%d): '%s'\n",
            sgpio_get_num(&gpio), SGPIO_EDGE_FALLING, sgpio_error_str(retv));
     
-    retv = sgpio_set_edge(&gpio, SGPIO_EDGE_BOTH);
-    printf(">>> sgpio_set_edge(%d,%d): '%s'\n",
-           sgpio_get_num(&gpio), SGPIO_EDGE_BOTH, sgpio_error_str(retv));
+  }
+  
+  if (1)
+  {
+    retv = sgpio_set_dir(&gpio, SGPIO_DIR_IN);
+    printf(">>> sgpio_set_dir(%d,%d): '%s'\n",
+           sgpio_get_num(&gpio), SGPIO_DIR_IN, sgpio_error_str(retv));
   }
   
   if (1)
   {
     retv = sgpio_get_val(&gpio);
-    printf(">>> sgpio_get_val(%i) = '%d'",
+    printf(">>> sgpio_get_val(%i) = %d",
            sgpio_get_num(&gpio), retv);
     if (retv < 0)
       printf(" '%s'\n", sgpio_error_str(retv));
@@ -66,6 +61,28 @@ int main()
   }
 
   if (1)
+  {
+    retv = sgpio_poll(&gpio, 3000);
+    printf(">>> sgpio_poll(%i) = %d",
+           sgpio_get_num(&gpio), retv);
+    if (retv < 0)
+      printf(" '%s'\n", sgpio_error_str(retv));
+    else
+      printf("\n");
+  }
+
+  if (1) for (i = 0 ; i < 10; i++)
+  {
+    retv = sgpio_get_val(&gpio);
+    printf(">>> sgpio_get_val(%i) = %d",
+           sgpio_get_num(&gpio), retv);
+    if (retv < 0)
+      printf(" '%s'\n", sgpio_error_str(retv));
+    else
+      printf("\n");
+  }
+
+  if (0)
   {
     retv = sgpio_set_dir(&gpio, SGPIO_DIR_OUT);
     printf(">>> sgpio_set_dir(%d,%d): '%s'\n",
@@ -74,7 +91,7 @@ int main()
 
   }
 
-  if (1)
+  if (0)
   {
     retv = sgpio_set_val(&gpio, 1);
     printf(">>> sgpio_set_val(%i,1): '%s'\n",
@@ -85,7 +102,7 @@ int main()
   if (1)
   {
     retv = sgpio_get_val(&gpio);
-    printf(">>> sgpio_get_val(%i) = '%d'",
+    printf(">>> sgpio_get_val(%i) = %d",
            sgpio_get_num(&gpio), retv);
     if (retv < 0)
       printf(" '%s'\n", sgpio_error_str(retv));
@@ -96,7 +113,7 @@ int main()
   if (1)
   {
     retv = sgpio_poll(&gpio, 3000);
-    printf(">>> sgpio_poll(%i) = '%d'",
+    printf(">>> sgpio_poll(%i) = %d",
            sgpio_get_num(&gpio), retv);
     if (retv < 0)
       printf(" '%s'\n", sgpio_error_str(retv));
@@ -104,7 +121,7 @@ int main()
       printf("\n");
   }
 
-  if (1)
+  if (0)
   {
     retv = sgpio_unexport(gpio_num);
     printf(">>> sgpio_unexport(%d): '%s'\n",
