@@ -3,10 +3,11 @@
  * File: "sgpio.c"
  */
 //----------------------------------------------------------------------------
-#include "sgpio.h"  // `sgpio_t`
-#include <errno.h>  // errno
-#include <string.h> // strlen(), memset()
-#include <poll.h>   // poll()
+#include "sgpio.h"     // `sgpio_t`
+#include <errno.h>     // errno
+#include <string.h>    // strlen(), memset(), strerror()
+#include <poll.h>      // poll()
+#include <sys/epoll.h> // epoll()
 //----------------------------------------------------------------------------
 // write `size` bytes to stream `fd` from `buf` at once
 int sgpio_write(int fd, const char *buf, int size)
@@ -143,7 +144,7 @@ int sgpio_set_dir(sgpio_t *self, int dir)
            SGPIO_MAIN_PATH "gpio%d/value", self->num);
   
   if      (dir == SGPIO_DIR_IN)
-    fd = open(fname, O_RDONLY);
+    fd = open(fname, O_RDONLY | O_NONBLOCK);
   else if (dir == SGPIO_DIR_OUT)
     fd = open(fname, O_RDWR | O_TRUNC);
 
@@ -320,6 +321,53 @@ int sgpio_poll_ex(const sgpio_t *self, int msec, int sigmask)
   return 0; // empty
 }
 //----------------------------------------------------------------------------
+// epool wraper for non block read (return 0:false, 1:true, <0:error code)
+// msec - timeout in ms
+int sgpio_epoll(const sgpio_t *self, int msec)
+{
+  int epfd, retv, i;
+  struct epoll_event ev, events[10];
+  
+  ev.events  = EPOLLET;
+  ev.data.fd = self->fd;
+  
+  epfd = epoll_create(1);
+  if (epfd < 0)
+  {
+    SGPIO_DBG("epoll_create(1) return %d: '%s' in sgpio_epoll()",
+              epfd, strerror(errno));
+    return SGPIO_ERR_EPOOL1;
+  }
+
+  retv = epoll_ctl(epfd, EPOLL_CTL_ADD, self->fd, &ev);
+  if (retv != 0)
+  {
+    SGPIO_DBG("epoll_ctl() return %d: '%s' in sgpio_epoll()",
+              retv, strerror(errno));
+    return SGPIO_ERR_EPOOL2;
+  }
+
+  while (1)
+  {
+    retv = epoll_wait(epfd, events, 9, msec);
+
+    if (retv < 0)
+    {
+      SGPIO_DBG("epoll_wait() return %d: '%s' in sgpio_epoll()",
+                retv, strerror(errno));
+      return SGPIO_ERR_EPOOL3;
+    }
+
+    for (i = 0; i < retv; i++)
+    {
+      if (events[i].data.fd == ev.data.fd)
+        return 1; // ready
+    }
+
+    return 0; // empty
+  }
+}
+//----------------------------------------------------------------------------
 const char *sgpio_errors[] = {
   "success",
   "can't write fo file",
@@ -336,6 +384,9 @@ const char *sgpio_errors[] = {
   "write(1) return not a one in sgpio_set_val()",
   "pool() return error #1",
   "pool() return error #2",
+  "epool() return error #1",
+  "epool() return error #2",
+  "epool() return error #3",
 };
 static const char *sgpio_error_unknown = "unknown error";
 //----------------------------------------------------------------------------

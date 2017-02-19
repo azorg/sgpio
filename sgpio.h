@@ -61,8 +61,11 @@
 #define SGPIO_ERR_SET       -12 // write(1) return not a one in sgpio_set_val() 
 #define SGPIO_ERR_POOL1     -13 // pool() return error #1
 #define SGPIO_ERR_POOL2     -14 // pool() return error #2
+#define SGPIO_ERR_EPOOL1    -15 // epool() return error #1
+#define SGPIO_ERR_EPOOL2    -16 // epool() return error #2
+#define SGPIO_ERR_EPOOL3    -17 // epool() return error #3
 
-#define SGPIO_ERROR_NUM        15          // look sgpio_error_str() code
+#define SGPIO_ERROR_NUM        18          // look sgpio_error_str() code
 #define SGPIO_ERROR_INDEX(err) (0 - (err)) // ...
 //----------------------------------------------------------------------------
 // GPIO input/output direction mode
@@ -160,6 +163,10 @@ SGPIO_INLINE int sgpio_poll(const sgpio_t *self, int msec)
 {
   return sgpio_poll_ex(self, msec, 0);
 }
+//----------------------------------------------------------------------------
+// epool wraper for non block read (return 0:false, 1:true, <0:error code)
+// msec - timeout in ms
+int sgpio_epoll(const sgpio_t *self, int msec);
 //----------------------------------------------------------------------------
 // return SGPIO error string
 const char *sgpio_error_str(int err);
