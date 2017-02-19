@@ -3,9 +3,10 @@
  * File: "sgpio.c"
  */
 //----------------------------------------------------------------------------
-#include "sgpio.h"  // `sgpio_t`
-#include <errno.h>  // errno
-#include <string.h> // strlen()
+#include "sgpio.h"    // `sgpio_t`
+#include <errno.h>    // errno
+#include <string.h>   // strlen()
+#include <sys/poll.h> // poll()
 //----------------------------------------------------------------------------
 // write `size` bytes to stream `fd` from `buf` at once
 int sgpio_write(int fd, const char *buf, int size)
@@ -268,6 +269,52 @@ int sgpio_set_val(sgpio_t *self, int val)
   return SGPIO_ERR_NONE;
 }
 //----------------------------------------------------------------------------
+// pool wraper for non block read (return 0:false, 1:true, <0:error code)
+// msec - timeout in ms
+// if sigmask!=0 ignore interrupt by signals
+int sgpio_poll_ex(const sgpio_t *self, int msec, int sigmask)
+{
+  struct pollfd fds[1];
+  int retv;
+
+  while (1)
+  {
+    fds->fd      = self->fd;
+    fds->events  = POLLIN | POLLPRI | POLLERR;
+    fds->revents = 0;
+
+    retv = poll(fds, 1, msec);
+    if (retv < 0)
+    {
+      if (errno == EINTR)
+      { // interrupt by signal
+        if (sigmask)
+          continue;
+        else
+          return 0;
+      }
+      return SGPIO_ERR_POOL1; // error #1
+    }
+
+    //if (fds->revents & POLLHUP)
+    //  continue;
+
+    break;
+  }
+
+  if (retv > 0)
+  {
+    //if (fds->revents & (POLLERR | POLLHUP | POLLNVAL))
+    if (fds->revents & (POLLERR | POLLNVAL))
+      return SGPIO_ERR_POOL2; // error #2
+
+    if (fds->revents & (POLLIN | POLLPRI))
+      return 1; // may non block read
+  }
+
+  return 0; // empty
+}
+//----------------------------------------------------------------------------
 const char *sgpio_errors[] = {
   "success",
   "can't write fo file",
@@ -282,6 +329,8 @@ const char *sgpio_errors[] = {
   "lseek(0) return non zero",
   "read(1) return not a one in sgpio_get_val()",
   "write(1) return not a one in sgpio_set_val()",
+  "pool() return error #1",
+  "pool() return error #2",
 };
 static const char *sgpio_error_unknown = "unknown error";
 //----------------------------------------------------------------------------

@@ -37,7 +37,7 @@
 #  define SGPIO_INLINE static inline
 #endif // SGPIO_INLINE
 //----------------------------------------------------------------------------
-//#define SGPIO_DEBUG
+//#define SGPIO_DEBUG // FIXME
 #ifdef SGPIO_DEBUG
 #  include <stdio.h>  // fprintf()
 #    define SGPIO_DBG(fmt, arg...) fprintf(stderr, "SGPIO: " fmt "\n", ## arg)
@@ -59,8 +59,10 @@
 #define SGPIO_ERR_LSEEK     -10 // lseek(0) return non zero 
 #define SGPIO_ERR_GET       -11 // read(1) return not a one in sgpio_get_vl() 
 #define SGPIO_ERR_SET       -12 // write(1) return not a one in sgpio_set_val() 
+#define SGPIO_ERR_POOL1     -13 // pool() return error #1
+#define SGPIO_ERR_POOL2     -14 // pool() return error #2
 
-#define SGPIO_ERROR_NUM        13          // look sgpio_error_str() code
+#define SGPIO_ERROR_NUM        15          // look sgpio_error_str() code
 #define SGPIO_ERROR_INDEX(err) (0 - (err)) // ...
 //----------------------------------------------------------------------------
 // GPIO input/output direction mode
@@ -146,6 +148,18 @@ int sgpio_get_val(sgpio_t *self);
 //----------------------------------------------------------------------------
 // set value (return 0 or 1 or error code < 0)
 int sgpio_set_val(sgpio_t *self, int val);
+//----------------------------------------------------------------------------
+// pool wraper for non block read (return 0:false, 1:true, <0:error code)
+// msec - timeout in ms
+// if sigmask!=0 ignore interrupt by signals
+int sgpio_poll_ex(const sgpio_t *self, int msec, int sigmask);
+//----------------------------------------------------------------------------
+// pool wraper for non block read (return 0:false, 1:true, <0:error code)
+// msec - timeout in ms
+SGPIO_INLINE int sgpio_poll(const sgpio_t *self, int msec)
+{
+  return sgpio_poll_ex(self, msec, 0);
+}
 //----------------------------------------------------------------------------
 // return SGPIO error string
 const char *sgpio_error_str(int err);
