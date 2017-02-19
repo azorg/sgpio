@@ -15,7 +15,7 @@ HDRS := \
 #SRC_DIRS := . ..
 #HDR_DIRS := . ..
 #----------------------------------------------------------------------------
-DEFS    := -DRND_USE_STDLIB
+DEFS    := -DSGPIO_DEBUG
 #OPTIM  := -g -O0
 OPTIM   := -Os
 WARN    := -Wall
