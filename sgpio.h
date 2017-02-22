@@ -46,24 +46,24 @@
 #endif // SGPIO_DEBUG
 //----------------------------------------------------------------------------
 // common error codes (return values)
-#define SGPIO_ERR_NONE        0 // no error, success
-#define SGPIO_ERR_WRITE      -1 // can't write fo file
-#define SGPIO_ERR_EXPORT     -2 // can't export
-#define SGPIO_ERR_UNEXPORT   -3 // can't unexport
-#define SGPIO_ERR_OPEN_DIR   -4 // can't open "direction" file
-#define SGPIO_ERR_OPEN_EDGE  -5 // can't open "edge" file
-#define SGPIO_ERR_SET_DIR    -6 // can't write to "direction" file
-#define SGPIO_ERR_SET_EDGE   -7 // can't write to "edge" file
-#define SGPIO_ERR_OPEN_VAL   -8 // can't open "value" file
-#define SGPIO_ERR_UNSET_DIR  -9 // direction is unset
-#define SGPIO_ERR_LSEEK     -10 // lseek(0) return non zero 
-#define SGPIO_ERR_GET       -11 // read(1) return not a one in sgpio_get_vl() 
-#define SGPIO_ERR_SET       -12 // write(1) return not a one in sgpio_set_val() 
-#define SGPIO_ERR_POOL1     -13 // pool() return error #1
-#define SGPIO_ERR_POOL2     -14 // pool() return error #2
-#define SGPIO_ERR_EPOOL1    -15 // epool() return error #1
-#define SGPIO_ERR_EPOOL2    -16 // epool() return error #2
-#define SGPIO_ERR_EPOOL3    -17 // epool() return error #3
+#define SGPIO_ERR_NONE         0 // no error, success
+#define SGPIO_ERR_WRITE       -1 // can't write fo file
+#define SGPIO_ERR_EXPORT      -2 // can't export
+#define SGPIO_ERR_UNEXPORT    -3 // can't unexport
+#define SGPIO_ERR_OPEN_DIR    -4 // can't open "direction" file
+#define SGPIO_ERR_OPEN_EDGE   -5 // can't open "edge" file
+#define SGPIO_ERR_SET_DIR     -6 // can't write to "direction" file
+#define SGPIO_ERR_SET_EDGE    -7 // can't write to "edge" file
+#define SGPIO_ERR_OPEN_VAL    -8 // can't open "value" file
+#define SGPIO_ERR_UNSET_MODE  -9 // mode is unset
+#define SGPIO_ERR_LSEEK      -10 // lseek(0) return non zero 
+#define SGPIO_ERR_GET        -11 // read(1) return not a one in sgpio_get() 
+#define SGPIO_ERR_SET        -12 // write(1) return not a one in sgpio_set() 
+#define SGPIO_ERR_POOL1      -13 // pool() return error #1
+#define SGPIO_ERR_POOL2      -14 // pool() return error #2
+#define SGPIO_ERR_EPOOL1     -15 // epool() return error #1
+#define SGPIO_ERR_EPOOL2     -16 // epool() return error #2
+#define SGPIO_ERR_EPOOL3     -17 // epool() return error #3
 
 #define SGPIO_ERROR_NUM        18          // look sgpio_error_str() code
 #define SGPIO_ERROR_INDEX(err) (0 - (err)) // ...
@@ -121,8 +121,10 @@ SGPIO_INLINE void sgpio_free(sgpio_t *self)
   self->fd = -1;
 }
 //----------------------------------------------------------------------------
-// get GPIO number
-SGPIO_INLINE int sgpio_get_num(const sgpio_t *self) { return self->num; }
+// set GPIO mode
+int sgpio_mode(sgpio_t *self,
+               int dir,   // sgpio_dir_t
+               int edge); // sgpio_edge_t
 //----------------------------------------------------------------------------
 // set GPIO number
 SGPIO_INLINE void sgpio_set_num(sgpio_t *self, int num)
@@ -135,22 +137,19 @@ SGPIO_INLINE void sgpio_set_num(sgpio_t *self, int num)
 SGPIO_INLINE int sgpio_fd(const sgpio_t *self) { return self->fd; }
 //----------------------------------------------------------------------------
 // get GPIO direction mode
-SGPIO_INLINE int sgpio_get_dir(const sgpio_t *self) { return self->dir; }
-//----------------------------------------------------------------------------
-// set GPIO direction mode
-int sgpio_set_dir(sgpio_t *self, int dir);
+SGPIO_INLINE int sgpio_dir(const sgpio_t *self) { return self->dir; }
 //----------------------------------------------------------------------------
 // get GPIO edge mode
-SGPIO_INLINE int sgpio_get_edge(const sgpio_t *self) { return self->edge; }
+SGPIO_INLINE int sgpio_edge(const sgpio_t *self) { return self->edge; }
 //----------------------------------------------------------------------------
-// set GPIO edge mode
-int sgpio_set_edge(sgpio_t *self, int edge);
+// get GPIO number
+SGPIO_INLINE int sgpio_num(const sgpio_t *self) { return self->num; }
 //----------------------------------------------------------------------------
 // get value (return 0 or 1 or error code < 0)
-int sgpio_get_val(sgpio_t *self);
+int sgpio_get(sgpio_t *self);
 //----------------------------------------------------------------------------
 // set value (return 0 or 1 or error code < 0)
-int sgpio_set_val(sgpio_t *self, int val);
+int sgpio_set(sgpio_t *self, int val);
 //----------------------------------------------------------------------------
 // pool wraper for non block read (return 0:false, 1:true, <0:error code)
 // msec - timeout in ms
