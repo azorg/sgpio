@@ -12,8 +12,8 @@ int main()
   sgpio_t gpio;
   int retv, i;
   //int gpio_num = 12; // 12 - Orange Pi Zero GPIO on pin 3 (SDA.0)
-  int gpio_num = 6;  // 6 - Orange Pi Zero GPIO on pin 7 (GPIO.7)
-  //int gpio_num = 1;  // 1 - Orange Pi Zero GPIO on pin 11 (RxD2)
+  //int gpio_num = 6;  // 6 - Orange Pi Zero GPIO on pin 7 (GPIO.7)
+  int gpio_num = 1;  // 1 - Orange Pi Zero GPIO on pin 11 (RxD2)
 
   sgpio_init(&gpio, gpio_num);
 

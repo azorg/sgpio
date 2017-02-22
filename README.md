@@ -16,5 +16,5 @@ Simple GPIO Linux wrappers
 5. Call sgpio_set() for output or sgpio_get() for input.
 
 6. For input lines with edge mode (rising, falling or both)
-   may use sgpio_poll() or sgpio_epool() functions.
+   may use sgpio_poll() or sgpio_epoll() functions.
 
