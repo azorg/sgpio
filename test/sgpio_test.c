@@ -114,7 +114,7 @@ for (i = 0; i < 4; i++) {
   if (0) // set to input (more safe mode)
   {
     retv = sgpio_mode(&gpio, SGPIO_DIR_IN, SGPIO_EDGE_NONE);
-    printf(">>> sgpio_set_dir(%d,%d,%d): '%s'\n",
+    printf(">>> sgpio_mode(%d,%d,%d): '%s'\n",
            sgpio_num(&gpio), SGPIO_DIR_IN, SGPIO_EDGE_NONE,
            sgpio_error_str(retv));
   }
