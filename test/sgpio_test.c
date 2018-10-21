@@ -106,7 +106,7 @@ for (i = 0; i < 4; i++) {
       else
         printf("\n");
 
-        sleep(1);
+      sleep(1);
     } // for
   }
 
