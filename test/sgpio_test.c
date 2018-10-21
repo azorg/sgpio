@@ -11,9 +11,11 @@ int main()
 {
   sgpio_t gpio;
   int retv, i;
-  //int gpio_num = 12; // 12 - Orange Pi Zero GPIO on pin 3 (SDA.0)
-  //int gpio_num = 6;  // 6 - Orange Pi Zero GPIO on pin 7 (GPIO.7)
-  int gpio_num = 1;  // 1 - Orange Pi Zero GPIO on pin 11 (RxD2)
+  //int gpio_num = 12; // 12 - Orange Pi GPIO on pin 3 (PA12 - SDA.0)
+  //int gpio_num = 1;  // 1 - Orange Pi GPIO on pin 11 (PA1 - RxD2)
+  //int gpio_num = 6;  // 6 - Orange Pi GPIO on pin 7 (PA6 - GPIO.7)
+  //int gpio_num = 0;  // 0 - Orange Pi GPIO on pin 13 (PA0 - TxD2)
+  int gpio_num = 2;  // 2 - Orange Pi GPIO on pin 22 (PA2 - RTS2)
 
   sgpio_init(&gpio, gpio_num);
 
@@ -31,7 +33,7 @@ int main()
            gpio_num, sgpio_error_str(retv));
   }
 
-  if (1) // input test
+  if (0) // input test
   {
 
     retv = sgpio_mode(&gpio, SGPIO_DIR_IN, SGPIO_EDGE_BOTH);
@@ -84,7 +86,7 @@ for (i = 0; i < 4; i++) {
   }
 }
   
-  if (0) // output test
+  if (1) // output test
   {
     retv = sgpio_mode(&gpio, SGPIO_DIR_OUT, SGPIO_EDGE_NONE);
     printf(">>> sgpio_mode(%d,%d,%d): '%s'\n",
@@ -111,7 +113,7 @@ for (i = 0; i < 4; i++) {
   }
 
 
-  if (0) // set to input (more safe mode)
+  if (1) // set to input (more safe mode)
   {
     retv = sgpio_mode(&gpio, SGPIO_DIR_IN, SGPIO_EDGE_NONE);
     printf(">>> sgpio_mode(%d,%d,%d): '%s'\n",
@@ -119,7 +121,7 @@ for (i = 0; i < 4; i++) {
            sgpio_error_str(retv));
   }
 
-  if (0) // unexport
+  if (1) // unexport
   {
     retv = sgpio_unexport(gpio_num);
     printf(">>> sgpio_unexport(%d): '%s'\n",
